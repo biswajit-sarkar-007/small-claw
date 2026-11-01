@@ -51,22 +51,22 @@ export async function runPlanMode(): Promise<void> {
     console.log(chalk.bold(`\n🔧 ${step.title}\n`));
 
     const agent = new ToolLoopAgent({
-      model:getAgentModel(),
-      stopWhen:stepCountIs(30),
+      model: getAgentModel(),
+      stopWhen: stepCountIs(30),
       tools
     });
 
-    const r = await agent.generate({prompt:stepPrompt(plan.goal , step)})
+    const r = await agent.generate({ prompt: stepPrompt(plan.goal, step) })
 
-    if(r.text) return console.log(renderTerminalMarkdown(r.text))
+    if (r.text) console.log(renderTerminalMarkdown(r.text))
 
   }
 
   const ok = await runApprovalFlow(tracker);
 
-  if(!ok) return executor.clearStaging();
+  if (!ok) return executor.clearStaging();
 
-   const { errors } = executor.applyApprovedFromTracker();
+  const { errors } = executor.applyApprovedFromTracker();
   if (errors.length) {
     console.log(chalk.red('\nSome operations reported errors:\n'));
     for (const e of errors) console.log(chalk.red(`  • ${e}`));
