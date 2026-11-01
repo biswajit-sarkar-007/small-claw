@@ -1,0 +1,30 @@
+{
+  "name": "small-claw",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "small-claw": "./index.ts"
+  },
+  "scripts": {
+    "typecheck": "bun check"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.6.6"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@clack/core": "^1.5.1",
+    "@clack/prompts": "^1.8.1",
+    "@openrouter/ai-sdk-provider": "^3.1.0",
+    "ai": "^7.0.159",
+    "chalk": "^6.0.1",
+    "commander": "^15.0.0",
+    "figlet": "^1.12.0",
+    "marked": "^18.1.2",
+    "marked-terminal": "^8.0.0"
+  }
+}
