@@ -18,7 +18,7 @@ export async function runCliMode(){
         }
 
         if(mode==='agent'){await runAgentMode()};
-        if(mode ==='ask'){console.log("ask")};
+        if(mode ==='ask'){await runAgentMode()};
         if(mode==='plan'){console.log("plan")};
 
         if(mode !== 'agent' && mode !== 'ask' && mode !== 'plan'){
