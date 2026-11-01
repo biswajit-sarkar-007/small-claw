@@ -4,10 +4,11 @@ import { ToolLoopAgent, stepCountIs, tool } from "ai";
 import { z } from "zod";
 import { getAgentModel } from "../../ai/ai.config.ts";
 import { ActionTracker } from "../agent/action-tracker.ts";
-import { ToolExecutor } from "../agent/tool-executer.ts";
+import { ToolExecutor } from "../agent/tool-executor.ts";
 import { defaultAgentConfig } from "../agent/types.ts";
 import { renderTerminalMarkdown } from "../../tui/terminal-md.ts";
 import { runApprovalFlow } from "../agent/approval.ts";
+import { createWebTools } from "../plan/web-tools.ts";
 
 function createAskTools(executor: ToolExecutor) {
   return {
@@ -19,6 +20,7 @@ function createAskTools(executor: ToolExecutor) {
       }),
       execute: async ({ path: p }) => executor.readFile(p),
     }),
+
     list_files: tool({
       description: "List files and directories under a path.",
       inputSchema: z.object({
@@ -28,6 +30,7 @@ function createAskTools(executor: ToolExecutor) {
       execute: async ({ path: p, recursive }) =>
         executor.listFiles(p, recursive),
     }),
+
     search_files: tool({
       description:
         'Find files matching a glob pattern (e.g. "*.ts", "**/*.md"). Optional content substring filter.',
@@ -41,6 +44,7 @@ function createAskTools(executor: ToolExecutor) {
       execute: async ({ root, pattern, content_contains }) =>
         executor.searchFiles(root, pattern, content_contains),
     }),
+
     analyze_codebase: tool({
       description:
         "Summarize structure: file counts, size, extensions. Read-only.",
@@ -76,7 +80,6 @@ export async function runAskMode() {
   console.log(chalk.bold("\n❓ Ask Mode\n"));
 
   const question = await text({ message: "What do you want to ask?" });
-
   if (isCancel(question) || !question.trim()) return;
 
   const config = defaultAgentConfig();
@@ -88,8 +91,10 @@ export async function runAskMode() {
   const tracker = new ActionTracker();
   const executor = new ToolExecutor(tracker, config);
 
+
   const tools = {
     ...createAskTools(executor),
+    ...createWebTools(tracker)
   };
 
   const agent = new ToolLoopAgent({
@@ -103,28 +108,27 @@ export async function runAskMode() {
   console.log("\n" + renderTerminalMarkdown(answer) + "\n");
 
   const wantsSave = await confirm({
-    message: "Save this answer to a .md file in the current directory?",
-    initialValue: false,
+    message:"Save this answer to a .md file in the current directory?",
+    initialValue:false,
   });
-
   if (isCancel(wantsSave) || !wantsSave) return;
+
   const filename = await text({
-    message: "Filename",
-    initialValue: "ask.md",
-    validate: (v) => {
-      const s = (v ?? "").trim();
-      if (!s) return "Required";
-      if (s.includes("..") || s.includes("/") || s.includes("\\"))
-        return "No paths";
-      if (!s.toLowerCase().endsWith(".md")) return "Must end with .md";
+    message:"Filename",
+    initialValue:"ask.md",
+     validate: (v) => {
+      const s = (v ?? '').trim();
+      if (!s) return 'Required';
+      if (s.includes('..') || s.includes('/') || s.includes('\\')) return 'No paths';
+      if (!s.toLowerCase().endsWith('.md')) return 'Must end with .md';
     },
-  });
+  })
 
-  if (isCancel(filename)) return;
+  if(isCancel(filename)) return;
 
-  executor.createFile(filename, asMd(question, answer));
+  executor.createFile(filename , asMd(question , answer));
   const ok = await runApprovalFlow(tracker);
-  if (!ok) return executor.clearStaging();
+  if(!ok) return executor.clearStaging();
 
   executor.applyApprovedFromTracker();
   executor.clearStaging();

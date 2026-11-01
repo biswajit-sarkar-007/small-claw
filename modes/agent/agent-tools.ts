@@ -1,6 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
-import type { ToolExecutor } from "./tool-executer";
+import type { ToolExecutor } from "./tool-executor";
 
 export function createAgentTools(executor: ToolExecutor) {
   return {
