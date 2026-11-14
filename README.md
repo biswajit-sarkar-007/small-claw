@@ -2,6 +2,14 @@
 
 A lightweight, terminal-based AI coding agent powered by [OpenRouter](https://openrouter.ai/) and the [Vercel AI SDK](https://sdk.vercel.ai/). Think of it as a small, nimble version of a full-blown AI coding assistant — available right from your CLI or as a Telegram bot.
 
+
+https://github.com/user-attachments/assets/21429037-5262-4a96-a9d7-d412d3fa407e
+
+
+
+https://github.com/user-attachments/assets/5ecc439f-0532-46f2-9e4e-ca015fe5fb9a
+
+
 ## Features
 
 - **🤖 Agent Mode** — Give the agent a task and it will read, create, modify, and delete files in your codebase. All mutations are staged and require your approval before being applied.
